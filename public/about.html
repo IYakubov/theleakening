@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About – The Leakening</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    body {
+      background-image: url('images/progress-bckg.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      margin: 0;
+      font-family: 'PixelifySans', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      height: 100vh;
+    }
+
+    .about-panel {
+      width: 488px;
+      max-height: 75vh;
+      overflow-y: auto;
+      margin-top: 60px;
+      background-color: white;
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      position: relative;
+    }
+
+    .about-panel::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .about-panel::-webkit-scrollbar-thumb {
+      background-color: rgba(0, 0, 0, 0.2);
+      border-radius: 3px;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 24px;
+      font-family: 'PixelifySans', sans-serif;
+      cursor: pointer;
+      color: #444;
+      z-index: 11;
+    }
+
+    h2 {
+      text-align: center;
+      margin-top: 0;
+    }
+
+    p {
+      margin: 10px 0;
+      font-size: 16px;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+  <div class="about-panel">
+    <span class="close-btn" onclick="goBack()">X</span>
+    <h2>About The Leakening</h2>
+    <p><strong>The Leakening</strong> is a gamified task management app designed to help you complete your tasks before they sink — literally!</p>
+    <p>In this app, every task you create launches a ship across the screen. But beware: as time passes, the ship starts to sink. Your goal? Finish your tasks before the ship goes under!</p>
+    <h3>🚀 How it Works:</h3>
+    <ul>
+      <li>📝 You create a task and set a time limit</li>
+      <li>🚢 A ship appears on the ocean and starts slowly sinking</li>
+      <li>⏳ The more time passes, the deeper the ship sinks </li>
+      <li>✅ When you complete a task, press the red “Done” button to turn it green</li>
+      <li>✅ After completing all tasks, press “Finish Tasks” to save your ship</li>
+      <li>❌ If you don’t finish on time, the ship sinks completely</li>
+    </ul>
+    <p>We wanted task management to be <strong>visual</strong>, <strong>motivating</strong>, and a little bit fun.  
+    Instead of boring lists, you get a feeling of urgency and satisfaction — because every task saved is a ship rescued.</p>
+  </div>
+
+  <script>
+    function goBack() {
+      window.close(); // closes the tab if opened in a new one
+    }
+  </script>
+</body>
+</html>

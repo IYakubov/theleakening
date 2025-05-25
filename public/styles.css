@@ -1,0 +1,364 @@
+@font-face {
+  font-family: 'PixelifySans';
+  src: url('./fonts/PixelifySans-VariableFont_wght.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+body, html {
+  margin: 0;
+  padding: 0;
+  font-family: 'PixelifySans', sans-serif;
+  background-color: #ffffff;
+  overflow: hidden;
+}
+
+.login-body {
+  background-image: url('images/main-bckg.svg');
+  background-size: cover;
+  background-position: center;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-top: 80px;
+  padding-bottom: 20px;
+}
+
+
+.login-panel {
+  width: 488px;
+  height: 259px;
+  background-color: white;
+  border-radius: 20px;
+  text-align: center;
+  padding-top: 20px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.login-panel h2 {
+  font-size: 20px;
+  margin: 10px 0 20px;
+}
+
+.login-panel form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.login-panel input {
+  width: 70%;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #aaa;
+  border-radius: 8px;
+  outline: none;
+  font-family: 'PixelifySans', sans-serif;
+}
+
+.login-button {
+  background-image: url('images/login-btn.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  width: 187px;
+  height: 64px;
+  border: none;
+  cursor: pointer;
+}
+
+/* Main dashboard */
+.main-body {
+  background-image: url('images/main-bckg.svg');
+  background-size: cover;
+  background-position: center;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column; 
+  align-items: center;
+  justify-content: flex-end;
+  padding-bottom: 30px;
+}
+
+
+
+.main-panel {
+  display: flex;
+  gap: 25px;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 30px; /* <-- This is what fixes the sticking issue */
+}
+
+.main-btn {
+  width: 259px;
+  height: 88px;
+  cursor: pointer;
+}
+
+/* Modal Add Task */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999; 
+}
+
+
+.modal.hidden {
+  display: none;
+}
+
+.modal-content {
+  position: relative;
+  width: 488px;
+  height: 225px;
+  background-color: white;
+  border-radius: 20px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+
+.modal-content h2 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.modal-content input {
+  width: 80%;
+  margin: 5px auto;
+  padding: 10px;
+  font-size: 16px;
+  font-family: 'PixelifySans', sans-serif;
+  border-radius: 10px;
+  border: 1px solid #aaa;
+}
+
+.add-task-btn {
+  background-image: url('images/add-task-btn.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  width: 187px;
+  height: 64px;
+  border: none;
+  cursor: pointer;
+  margin: 10px auto 0;
+}
+
+/* Responsive tweaks */
+@media screen and (max-width: 600px) {
+  .login-panel,
+  .modal-content {
+    width: 90%;
+    height: auto;
+    padding: 20px;
+  }
+
+  .login-panel input,
+  .modal-content input {
+    width: 90%;
+    font-size: 14px;
+  }
+
+  .login-button,
+  .add-task-btn {
+    width: 150px;
+    height: 52px;
+  }
+
+  .main-btn {
+    width: 220px;
+    height: 72px;
+  }
+}
+/* Progress page enhancements */
+.ship-container {
+  transition: left 1s linear;
+}
+.done-buttons {
+  flex-direction: row;
+}
+
+.close-btn {
+  position: absolute;
+  top: 12px;
+  right: 20px;
+  font-family: 'PixelifySans', sans-serif;
+  font-size: 24px;
+  cursor: pointer;
+  color: #444;
+  z-index: 10;
+}
+
+.hidden {
+  display: none;
+}
+
+.error-popup {
+  position: fixed;
+  top: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 400px;
+  background-color: white;
+  color: red;
+  font-family: 'PixelifySans', sans-serif;
+  border-radius: 20px;
+  text-align: center;
+  padding: 25px 20px 20px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+  z-index: 10;
+}
+
+.error-popup p {
+  margin: 10px 0 0;
+  font-size: 18px;
+}
+
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 24px;
+  font-family: 'PixelifySans', sans-serif;
+  cursor: pointer;
+  color: #444;
+  z-index: 11;
+}
+
+.floating-ship {
+  display: flex;
+  justify-content: center;
+  margin-top: 40px;
+  margin-bottom: 20px;
+  animation: float 3s ease-in-out infinite;
+}
+
+.floating-ship img {
+  width: 150px;
+  height: auto;
+}
+
+@keyframes float {
+  0%   { transform: translateY(0); }
+  50%  { transform: translateY(-10px); }
+  100% { transform: translateY(0); }
+}
+
+.main-floating-area {
+  position: relative;
+  width: 100%;
+  height: 240px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  margin-bottom: 10px;
+}
+
+.main-water {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 120px;
+  background-image: url('images/water.png');
+  background-size: cover;
+  background-repeat: no-repeat;
+  z-index: 1;
+}
+
+.main-ship {
+  position: absolute;
+  bottom: 100px;
+  width: 25%;
+  animation: float 3s ease-in-out infinite;
+  z-index: 2;
+}
+
+@keyframes float {
+  0%   { transform: translateY(0); }
+  50%  { transform: translateY(-10px); }
+  100% { transform: translateY(0); }
+}
+
+.done-btn,
+#finish-btn {
+  animation: float 3s ease-in-out infinite;
+  transition: transform 0.15s ease;
+  will-change: transform;
+}
+
+/* Press-down effect on click */
+.done-btn:active,
+#finish-btn:active {
+  animation: none !important;       /* temporarily stop floating */
+  transform: translateY(3px) !important;
+}
+
+
+/* Reuse float animation */
+@keyframes float {
+  0%   { transform: translateY(0); }
+  50%  { transform: translateY(-8px); }
+  100% { transform: translateY(0); }
+}
+
+.hidden {
+  display: none !important;
+}
+
+.mobile-blocker {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(255,255,255,0.95);
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.mobile-message {
+  text-align: center;
+  font-family: 'PixelifySans', sans-serif;
+  background: white;
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  width: 90%;
+  max-width: 400px;
+  position: relative;
+}
+
+.mobile-message p {
+  font-size: 18px;
+  color: #222;
+}
+
+.mobile-message .close-btn {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 24px;
+  font-family: 'PixelifySans', sans-serif;
+  cursor: pointer;
+  color: #666;
+}

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Task History – The Leakening</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+   body {
+  background-image: url('images/progress-bckg.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  font-family: 'PixelifySans', sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+
+     .history-panel {
+    width: 488px;
+    max-height: 70vh;
+    overflow-y: auto;
+    margin: 60px auto;
+    background-color: white;
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    position: relative;
+  }
+  .history-panel::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .history-panel::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+  }
+
+    .history-panel h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 24px;
+    }
+
+    .task-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid #ddd;
+      font-size: 16px;
+    }
+
+    .task-title {
+      font-weight: bold;
+    }
+
+    .task-status {
+      text-transform: uppercase;
+    }
+
+    .status-active {
+      color: blue;
+    }
+
+    .status-completed {
+      color: green;
+    }
+
+    .status-failed {
+      color: red;
+    }
+
+    @media screen and (max-width: 600px) {
+      .history-panel {
+        width: 90%;
+        padding: 15px;
+      }
+
+      .history-panel h2 {
+        font-size: 20px;
+      }
+
+      .task-item {
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+ <div class="history-panel">
+  <span class="close-btn" onclick="goBack()">X</span>
+  <h2>Task History</h2>
+  <div id="task-list"></div>
+</div>
+
+
+  <script>
+    async function loadTasks() {
+      const res = await fetch('/get-tasks');
+      const tasks = await res.json();
+      const now = Date.now();
+      const list = document.getElementById('task-list');
+      list.innerHTML = '';
+
+      tasks.forEach(task => {
+        const div = document.createElement('div');
+        div.className = 'task-item';
+
+        const createdAt = new Date(task.created_at);
+        const deadline = task.created_at + task.duration * 60000;
+        const isFailed = task.status === 'active' && now > deadline;
+
+        const statusClass =
+          task.status === 'completed' ? 'status-completed' :
+          isFailed ? 'status-failed' :
+          'status-active';
+
+        const statusLabel =
+          task.status === 'completed' ? 'Completed' :
+          isFailed ? 'You sank the ship' : 'Active';
+
+        div.innerHTML = `
+          <span class="task-title">${task.title}</span>
+          <span class="task-status ${statusClass}">${statusLabel}</span>
+        `;
+        list.appendChild(div);
+      });
+    }
+
+    loadTasks();
+  </script>
+
+  <script>
+  async function loadTasks() {
+    const res = await fetch('/get-tasks');
+    const tasks = await res.json();
+    const now = Date.now();
+    const list = document.getElementById('task-list');
+    list.innerHTML = '';
+
+    tasks.forEach(task => {
+      const div = document.createElement('div');
+      div.className = 'task-item';
+
+      const deadline = task.created_at + task.duration * 60000;
+      const isFailed = task.status === 'active' && now > deadline;
+
+      const statusClass =
+        task.status === 'completed' ? 'status-completed' :
+        isFailed ? 'status-failed' : 'status-active';
+
+      const statusLabel =
+        task.status === 'completed' ? 'Completed' :
+        isFailed ? 'You sank the ship' : 'Active';
+
+      div.innerHTML = `
+        <span class="task-title">${task.title}</span>
+        <span class="task-status ${statusClass}">${statusLabel}</span>
+      `;
+      list.appendChild(div);
+    });
+  }
+
+  function goBack() {
+    window.location.href = '/main';
+  }
+
+  loadTasks();
+</script>
+
+
+
+</body>
+</html>

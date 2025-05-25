@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Progress – The Leakening</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    body {
+      width: 100vw;
+      height: 100vh;
+      background-image: url('./images/progress-bckg.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      margin: 0;
+      font-family: 'PixelifySans', sans-serif;
+      overflow: hidden;
+    }
+
+    #water {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 276px;
+      background-image: url('images/water.png');
+      background-size: cover;
+      background-repeat: no-repeat;
+      z-index: 1;
+    }
+
+    .ship-container {
+      position: absolute;
+      width: 296px;
+      height: 182px;
+      z-index: 2;
+      bottom: 276px;
+      display: block;
+    }
+
+    .ship-img {
+      width: 100%;
+      height: auto;
+    }
+
+    .done-buttons {
+      position: absolute;
+      bottom: 30px;
+      left: 30px;
+      display: flex;
+      gap: 10px;
+      z-index: 3;
+    }
+
+    .done-btn {
+      width: 50px;
+      height: 50px;
+      cursor: pointer;
+    }
+
+    #finish-btn {
+      position: absolute;
+      bottom: 30px;
+      right: 30px;
+      width: 251px;
+      height: 88px;
+      cursor: not-allowed;
+      z-index: 3;
+    }
+
+    .message-panel {
+      position: absolute;
+      top: 20%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 488px;
+      height: 180px;
+      background-color: white;
+      border-radius: 20px;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      font-size: 22px;
+      font-family: 'PixelifySans', sans-serif;
+      text-align: center;
+      z-index: 5;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+    }
+
+    .message-panel .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 24px;
+      font-family: 'PixelifySans', sans-serif;
+      cursor: pointer;
+      color: #444;
+      z-index: 11;
+    }
+
+    .no-task-panel {
+      position: absolute;
+      top: 25%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 488px;
+      height: 180px;
+      background-color: white;
+      border-radius: 20px;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      font-size: 20px;
+      font-family: 'PixelifySans', sans-serif;
+      text-align: center;
+      z-index: 4;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    }
+
+    .countdown-panel {
+      position: absolute;
+      top: 30px;
+      right: 30px;
+      background-color: rgba(255, 255, 255, 0.9);
+      padding: 10px 16px;
+      border-radius: 12px;
+      font-family: 'PixelifySans', sans-serif;
+      font-size: 16px;
+      z-index: 10;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+  </style>
+</head>
+<body>
+  <div id="countdown-panel" class="countdown-panel">
+    Ship will sink in: <span id="countdown">--:--</span>
+  </div>
+
+  <div id="water"></div>
+  <div class="ship-container" id="ship-container">
+    <img src="images/ship-1.png" id="ship" class="ship-img" />
+  </div>
+
+  <div class="done-buttons" id="done-buttons"></div>
+  <img id="finish-btn" src="images/finish-unavailable.png" />
+
+  <div class="message-panel" id="message-panel">
+    <span class="close-btn" onclick="location.reload()">X</span>
+    <p>You saved the ship! 🚢✅</p>
+  </div>
+
+  <div class="no-task-panel" id="no-task-panel">
+    You have no ships.<br>Create a task first.
+  </div>
+
+  <script>
+    let tasks = [];
+    let doneStatus = [];
+    let totalDuration = 0;
+    let firstCreated = 0;
+    let sinkingStopped = false;
+
+    let sinkInterval;
+    let moveInterval;
+    let countdownInterval;
+
+    async function fetchTasks() {
+      const res = await fetch('/get-tasks');
+      const allTasks = await res.json();
+
+      const now = Date.now();
+
+      tasks = allTasks.filter(t => {
+        const deadline = t.created_at + t.duration * 60000;
+        return t.status === 'active' && now <= deadline;
+      });
+
+      if (tasks.length === 0) {
+        document.getElementById('ship-container').style.display = 'none';
+        document.getElementById('done-buttons').style.display = 'none';
+        document.getElementById('finish-btn').style.display = 'none';
+        document.getElementById('countdown-panel').style.display = 'none';
+        document.getElementById('no-task-panel').style.display = 'flex';
+        return;
+      }
+
+      doneStatus = new Array(tasks.length).fill(false);
+      createDoneButtons();
+      setupShip();
+      setupFinishButton();
+    }
+
+    function createDoneButtons() {
+      const box = document.getElementById('done-buttons');
+      box.innerHTML = '';
+
+      tasks.forEach((task, i) => {
+        const btn = document.createElement('img');
+        btn.src = `images/done${i + 1}.png`;
+        btn.id = `done-${i}`;
+        btn.className = 'done-btn';
+        btn.onclick = () => toggleDone(i, task.id);
+        box.appendChild(btn);
+      });
+    }
+
+    function toggleDone(i, taskId) {
+      if (sinkingStopped) return;
+      doneStatus[i] = !doneStatus[i];
+      const btn = document.getElementById(`done-${i}`);
+      btn.src = doneStatus[i]
+        ? `images/done${i + 1}-g.png`
+        : `images/done${i + 1}.png`;
+      checkFinishStatus();
+    }
+
+    function setupFinishButton() {
+      checkFinishStatus();
+    }
+
+    function checkFinishStatus() {
+      const allDone = doneStatus.every(Boolean);
+      const finishBtn = document.getElementById('finish-btn');
+
+      if (allDone && !sinkingStopped) {
+        finishBtn.src = 'images/finish-available.png';
+        finishBtn.style.cursor = 'pointer';
+        finishBtn.onclick = async () => {
+          await fetch('/finish-tasks', { method: 'POST' });
+
+          sinkingStopped = true;
+          clearInterval(sinkInterval);
+          clearInterval(moveInterval);
+          clearInterval(countdownInterval);
+
+          document.getElementById('message-panel').style.display = 'flex';
+        };
+      } else {
+        finishBtn.src = 'images/finish-unavailable.png';
+        finishBtn.style.cursor = 'not-allowed';
+        finishBtn.onclick = null;
+      }
+    }
+
+    function setupShip() {
+      const ship = document.getElementById('ship');
+      const container = document.getElementById('ship-container');
+
+      const createdTimes = tasks.map(t => t.created_at);
+      const durations = tasks.map(t => t.duration * 60000);
+      firstCreated = Math.min(...createdTimes);
+      totalDuration = durations.reduce((a, b) => a + b, 0);
+      const endX = window.innerWidth / 2 - 148;
+
+      const sinkStep = totalDuration / 12;
+      const now = Date.now();
+      const elapsed = now - firstCreated;
+
+      const initialSinkFrame = Math.floor(elapsed / sinkStep) + 1;
+      const initialProgress = Math.min(elapsed / totalDuration, 1);
+      container.style.left = `${endX * initialProgress}px`;
+      ship.src = `images/ship-${Math.min(initialSinkFrame, 12)}.png`;
+
+      if (initialSinkFrame >= 12) {
+        sinkingStopped = true;
+        disableDoneButtons();
+        return;
+      }
+
+      moveInterval = setInterval(() => {
+        if (sinkingStopped) return;
+        const now = Date.now();
+        const elapsed = now - firstCreated;
+        const progress = Math.min(elapsed / totalDuration, 1);
+        container.style.left = `${endX * progress}px`;
+      }, 1000);
+
+      sinkInterval = setInterval(() => {
+        const now = Date.now();
+        const elapsed = now - firstCreated;
+        const frame = Math.floor(elapsed / sinkStep) + 1;
+        if (frame <= 12) {
+          ship.src = `images/ship-${frame}.png`;
+        }
+        if (frame >= 12) {
+          clearInterval(sinkInterval);
+          clearInterval(moveInterval);
+          sinkingStopped = true;
+          disableDoneButtons();
+          checkFinishStatus();
+        }
+      }, sinkStep);
+
+      startCountdownPanel(firstCreated + totalDuration);
+    }
+
+    function startCountdownPanel(endTime) {
+      const countdownEl = document.getElementById("countdown");
+
+      function updateCountdown() {
+        const now = Date.now();
+        const remaining = endTime - now;
+
+        if (remaining <= 0) {
+          countdownEl.textContent = "00:00";
+          clearInterval(countdownInterval);
+          return;
+        }
+
+        const minutes = Math.floor(remaining / 60000);
+        const seconds = Math.floor((remaining % 60000) / 1000);
+        countdownEl.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+      }
+
+      updateCountdown();
+      countdownInterval = setInterval(updateCountdown, 1000);
+    }
+
+    function disableDoneButtons() {
+      const box = document.getElementById('done-buttons');
+      [...box.children].forEach(btn => {
+        btn.style.pointerEvents = 'none';
+        btn.style.opacity = '0.6';
+      });
+    }
+
+    fetchTasks();
+  </script>
+
+  <audio autoplay loop>
+    <source src="audio/ocean.mp3" type="audio/mpeg">
+    Your browser does not support the audio tag.
+  </audio>
+</body>
+</html>

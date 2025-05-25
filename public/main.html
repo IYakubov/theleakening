@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>The Leakening – Dashboard</title>
+  <link rel="stylesheet" href="styles.css"/>
+</head>
+<body class="main-body">
+
+  <!-- Task Status Popup -->
+<div id="task-status-panel" class="error-popup hidden">
+  <span class="close-btn" onclick="closeStatus()">X</span>
+  <p id="task-status-text">Task status message</p>
+</div>
+
+<script>
+  function closeStatus() {
+    const panel = document.getElementById("task-status-panel");
+    panel.classList.add("hidden");
+  }
+
+  function showStatus(message, color = 'red') {
+    const panel = document.getElementById("task-status-panel");
+    const text = document.getElementById("task-status-text");
+    text.textContent = message;
+    panel.style.color = color;
+    panel.classList.remove("hidden");
+  }
+</script>
+<div class="main-floating-area">
+  <img src="images/ship-1.png" class="main-ship" />
+  <div class="main-water"></div>
+</div>
+
+<div class="main-panel">
+  <img src="images/add-task.png" alt="Add Task" class="main-btn" onclick="openAddTask()" />
+  <img src="images/progress.png" alt="Progress" class="main-btn" onclick="goToProgress()" />
+  <img src="images/task-history.png" alt="Task History" class="main-btn" onclick="goToHistory()" />
+  <img src="images/about-us.png" alt="About Us" class="main-btn" onclick="openAbout()" />
+</div>
+
+
+  <!-- Add Task Modal -->
+  <div id="add-task-modal" class="modal hidden">
+  <div class="modal-content">
+    <span class="close-btn" onclick="closeModal()">X</span>
+    <h2>CREATE YOUR TASK</h2>
+      <input type="text" id="task-title" placeholder="Task Title" />
+      <input type="number" id="task-time" placeholder="Time in minutes" />
+      <button onclick="createTask()" class="add-task-btn"></button>
+    </div>
+  </div>
+
+  <script>
+
+    function closeModal() {
+  document.getElementById("add-task-modal").classList.add("hidden");
+}
+    function openAddTask() {
+      document.getElementById("add-task-modal").classList.remove("hidden");
+    }
+
+    function goToProgress() {
+      window.open('/progress', '_blank');
+    }
+
+    function goToHistory() {
+      window.location.href = '/history';
+    }
+
+  async function createTask() {
+  const title = document.getElementById('task-title').value.trim();
+  const time = parseInt(document.getElementById('task-time').value);
+
+  if (!title || isNaN(time) || time <= 0) {
+    showStatus("Please enter a valid task title and time.");
+    return;
+  }
+
+  const response = await fetch('/create-task', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ title, duration: time })
+  });
+
+  if (response.ok) {
+    showStatus("Task created successfully!", "green");
+    setTimeout(() => location.reload(), 1000);
+  } else {
+    const msg = await response.text();
+    showStatus(msg);
+  }
+}
+function openAbout() {
+  window.open('/about', '_blank');
+}
+
+  </script>
+  <audio autoplay loop>
+  <source src="audio/ocean.mp3" type="audio/mpeg">
+  Your browser does not support the audio tag.
+</audio>
+</body>
+<script>
+  const audio = document.getElementById('bg-audio');
+  audio.volume = 0; // 0 = silent, 1 = full volume
+</script>
+</html>
